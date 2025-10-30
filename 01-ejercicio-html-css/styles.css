@@ -298,10 +298,15 @@ body > footer{
     border-radius: 1rem;
     display: flex;
     flex-direction: column;
+    /* Estos estilos son para sacar los que vienen por defecto de las lsitas */
+    list-style: none;
     
-    article{
-      padding: 1.5rem;
+    li {
       border-bottom: 1px solid rgba(255, 255, 255, .3);
+    }
+
+    li article{
+      padding: 1.5rem;
       display: flex;
       text-align: left;
 
@@ -329,7 +334,7 @@ body > footer{
       }
     }
 
-    article:last-child{
+    li:last-child{
       border-bottom: none;
     }
   }
