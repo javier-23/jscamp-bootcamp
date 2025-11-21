@@ -482,3 +482,15 @@ article {
     pointer-events: none;
   }
 }
+
+.jobs-loading{
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+}
+
+.no-results{
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+}

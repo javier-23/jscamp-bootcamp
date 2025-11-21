@@ -103,7 +103,7 @@
     "descripcion": "Buscamos un desarrollador frontend con experiencia en React, TypeScript y Tailwind CSS. Se valorará conocimiento en optimización de rendimiento y accesibilidad web.",
     "data": {
       "technology": ["react", "javascript"],
-      "modalidad": "monterrey",
+      "modalidad": "valencia",
       "nivel": "mid"
     }
   },
@@ -115,7 +115,7 @@
     "descripcion": "Estamos buscando un desarrollador backend con experiencia en Node.js, Express y bases de datos NoSQL. Se requiere conocimiento en arquitectura de microservicios.",
     "data": {
       "technology": ["nodejs", "javascript"],
-      "modalidad": "cdmx",
+      "modalidad": "bogota",
       "nivel": "mid"
     }
   },
@@ -139,7 +139,7 @@
     "descripcion": "Se busca ingeniero de QA con experiencia en automatización de pruebas utilizando herramientas como Selenium, Cypress o Playwright. Conocimiento deseado en CI/CD.",
     "data": {
       "technology": ["javascript", "nodejs"],
-      "modalidad": "guadalajara",
+      "modalidad": "lima",
       "nivel": "mid"
     }
   },
@@ -147,7 +147,7 @@
     "id": "d2e93b8a-0b41-4d09-9a52-36a0f418d493",
     "titulo": "Administrador de Sistemas",
     "empresa": "InfraTech Global",
-    "ubicacion": "Santiago de Chile",
+    "ubicacion": "Barcelona",
     "descripcion": "Buscamos un administrador de sistemas con experiencia en Linux, Docker y monitoreo de servidores. Conocimiento en scripting Bash o Python será un plus.",
     "data": {
       "technology": ["python", "ruby"],
