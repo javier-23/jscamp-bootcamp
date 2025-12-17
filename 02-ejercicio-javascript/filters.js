@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const jobs = document.querySelectorAll('.job-listing-card');
 
     // Obtener la búsqueda
-    const searchTerm = searchInput.value.toLowerCase();
+    // agregamos .trim() por si el usuario ingresa espacios vacíos
+    const searchTerm = searchInput.value.toLowerCase().trim();
 
     // Obtener los valores de los filtros
     const selectedLocation = filterLocation.value;
