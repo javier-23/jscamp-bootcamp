@@ -2,16 +2,18 @@ import { JobListings } from "./JobListings"
 import { Pagination } from "./Pagination"
 import { Spinner } from '../components/Spinner'
 
+/* Hicimos cambios con `if` para que el código sea más legible y evitar tanta lógica con `&&` anidados */
 {/* Sección con los resultados de búsqueda: resultados (spinner, error o trabajos), información de los resultado y paginación  */}
 export function SearchResultsSection({jobs, loading, error, handleRetry, totalPages, currentPage, handlePageChange, total, resultsPerPage}) {
-    return (
-        <section>
-            {/* Spinner de carga */}
-            {loading && <Spinner/>}
+    
+    {/* Spinner de carga */}
+    if(loading) return <section>
+        <Spinner/>
+    </section>
 
-            {/* Mensaje de error */}
-            {error && !loading &&(
-                <div style={{
+    {/* Mensaje de error */}
+    if(error) return <section>
+         <div style={{
                 textAlign: 'center',
                 padding: '2rem',
                 color: 'var(--text-light)'
@@ -35,18 +37,19 @@ export function SearchResultsSection({jobs, loading, error, handleRetry, totalPa
                     Reintentar
                 </button>
                 </div>
-            )}
+    </section>
 
-            {/* Listado de trabajos */}
-            {!loading && !error && <JobListings jobs={jobs}/>}
+    return (
+        <section>
+            <JobListings jobs={jobs}/>
             
             {/* Paginación */}
-            {!loading && !error && totalPages > 1 && (
+            {totalPages > 1 && (
                 <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
             )}
 
             {/* Texto informando con el rango de trabajos mostrados */}
-            {!loading && !error && total > 0 && (
+            {total > 0 && (
                 <p 
                     style={{"display": "flex", "justifyContent": "center", 
                             "alignItems": "center", "marginBottom": "2rem", 
