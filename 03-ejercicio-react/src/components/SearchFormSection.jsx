@@ -2,8 +2,11 @@ import { useEffect, useId, useState } from "react"
 
 let timeoutId = null
 
-const useSearchForm = ({idText, idTechnology, idLocation, idExperienceLevel, onSearch, onTextFilter, onReset, setCleanFilters, initialText, setTechnology, setLocation, setExperienceLevel}) => {
-    const [searchText, setSearchText] = useState(initialText || '')
+const useSearchForm = ({onSearch, onTextFilter, onReset, setCleanFilters, onTextChange}) => {
+    const idText = useId()
+    const idTechnology = useId()
+    const idLocation = useId()
+    const idExperienceLevel = useId()
     
     const handleSubmit = (event) => {
         event.preventDefault()
@@ -26,7 +29,7 @@ const useSearchForm = ({idText, idTechnology, idLocation, idExperienceLevel, onS
     // Búsqueda de texto en tiempo real
     const handleChangeText = (event) => {
         const text = event.target.value
-        setSearchText(text)
+        onTextChange(text)
 
         //Debounce: cancelar timeout anterior
         if(timeoutId) {
@@ -39,11 +42,6 @@ const useSearchForm = ({idText, idTechnology, idLocation, idExperienceLevel, onS
     }
 
     const handleReset = () => {
-        // Resetear el formulario
-        setSearchText('')
-        setTechnology('')
-        setLocation('')
-        setExperienceLevel('')
         setCleanFilters(false)
         // Notificar al padre
         onReset()
@@ -53,17 +51,15 @@ const useSearchForm = ({idText, idTechnology, idLocation, idExperienceLevel, onS
         handleSubmit,
         handleChangeText, 
         handleReset,
-        searchText
+        idText,
+        idTechnology,
+        idLocation,
+        idExperienceLevel
     }
 
 }
 
 export function SearchFormSection({ onSearch, onTextFilter, onReset, initialFilters, initialText }) {
-    const idText = useId()
-    const idTechnology = useId()
-    const idLocation = useId()
-    const idExperienceLevel = useId()
-
     // Estado para saber qué campo está activo
     const [focusedField, setFocusedField] = useState(null)
     const [cleanFilters, setCleanFilters ] = useState(false)
@@ -72,13 +68,37 @@ export function SearchFormSection({ onSearch, onTextFilter, onReset, initialFilt
     const [technology, setTechnology] = useState(initialFilters.technology || '')
     const [location, setLocation] = useState(initialFilters.location || '')
     const [experienceLevel, setExperienceLevel] = useState(initialFilters.experienceLevel || '')
+    const [searchText, setSearchText] = useState(initialText || '')
 
+    const handleResetSearchForm = () => {
+        setExperienceLevel('')
+        setTechnology('')
+        setLocation('')
+        setSearchText('')
+        setCleanFilters(false)
+        onReset()
+    }
+
+    const handleTextChange = (text) => {
+        setSearchText(text)
+    }
+
+    // con esto evitamos que se pasen tantos parametros al hook
     const {
         handleSubmit,
         handleChangeText,
         handleReset,
-        searchText
-    } = useSearchForm({idText, idTechnology, idLocation, idExperienceLevel, onSearch, onTextFilter, onReset, setCleanFilters, initialText, setTechnology, setLocation, setExperienceLevel})
+         idText,
+        idTechnology,
+        idLocation,
+        idExperienceLevel
+    } = useSearchForm({
+        onSearch,
+        onTextFilter,
+        onReset: handleResetSearchForm,
+        onTextChange: handleTextChange,
+        setCleanFilters
+    })
 
     useEffect(() => {
         const hasFilters = initialText || 

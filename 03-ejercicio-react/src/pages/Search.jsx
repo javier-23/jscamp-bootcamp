@@ -5,6 +5,10 @@ import { SearchResultsSection } from '../components/SearchResultsSection'
 
 const RESULTS_PER_PAGE = 5
 
+// Trabajar con strings puede generar errores dificiles de depurar. Por eso es mejor usar constantes para los nombres de las claves.
+const LOCAL_STORAGE_FILTERS_KEY = 'jobFilters'
+const LOCAL_STORAGE_TEXT_KEY = 'jobSearchText'
+
 // Custom hook
 const useFilters = () => {
   const defaultFilters = {
@@ -14,38 +18,25 @@ const useFilters = () => {
   }
 
   const loadFiltersFromLocalStorage = () => {
-    try {
-      const stringFilters = localStorage.getItem('jobFilters')
+      // el try/catch no es necesario para `localStorage.getItem()`    
+      const stringFilters = localStorage.getItem(LOCAL_STORAGE_FILTERS_KEY)
       
-      if(stringFilters != null){
-          const savedFilters = JSON.parse(stringFilters)
-          return savedFilters
-      }
-      else{
-        return defaultFilters
-      }
-    } catch (error) {
-      console.error('Error parsing filters from localStorage:', error)
-      return defaultFilters
-    }
+      // siempre es mas facil trabajar con el valor que es null primero. Con esto nos evitamos tener que trabajar con if/else 
+      if(stringFilters === null) return defaultFilters
+
+      const savedFilters = JSON.parse(stringFilters)
+      return savedFilters
   }
 
-  const loadTextFromLocalStorage = () => {
-    try {
-      return localStorage.getItem('jobSearchText') || ''
-    } catch (error) {
-      return ''
-    }
-  }
+  // en este caso no es necesario try/catch. `localStorage.getItem()` no lanza excepciones. Lo que si puede lanzar excepciones es el método `localStorage.setItem()`, pero es raro que falle. Solo lo hace si la memoria está llena o si el usuario entra en un modo del navegador privado.
+  const loadTextFromLocalStorage = () => localStorage.getItem(LOCAL_STORAGE_TEXT_KEY) || ''
 
-  const [filters, setFilters] = useState(() => {
-    // Primero intentar cargar desde URL
-    const urlParams = new URLSearchParams(window.location.search)
-    const urlText = urlParams.get('text')
-    
-    if (urlText) {
+  const [filters, setFilters] = useState(() => {    
+    // el if no ees necesario, siempre estas ejecutando el método `loadFiltersFromLocalStorage()`
+    /* if (urlText) {
       return loadFiltersFromLocalStorage() // Cargar filtros guardados al iniciar
     }
+    return loadFiltersFromLocalStorage() */
     return loadFiltersFromLocalStorage()
   })
  const [textToFilter, setTextToFilter] = useState(() => {
@@ -60,10 +51,11 @@ const useFilters = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  // Excelente ejecutar dos useEffects para eventos diferentes!
   // Guardar los filtros en el localStorage
   useEffect(() => {
     try{
-      localStorage.setItem('jobFilters', JSON.stringify(filters))
+      localStorage.setItem(LOCAL_STORAGE_FILTERS_KEY, JSON.stringify(filters))
     } catch (error) {
       console.error('Error saving filters to localStorage:', error)
     }
@@ -72,7 +64,7 @@ const useFilters = () => {
   // Guardar el texto de búsqueda
   useEffect(() => {
     try{
-      localStorage.setItem('jobSearchText', textToFilter)
+      localStorage.setItem(LOCAL_STORAGE_TEXT_KEY, textToFilter)
     } catch (error) {
       console.error('Error saving search text to localStorage:', error)
     }
@@ -85,10 +77,15 @@ const useFilters = () => {
         setError(null)
 
         const params = new URLSearchParams()
-        if (textToFilter) params.append('text', textToFilter)
-        if (filters.technology) params.append('technology', filters.technology)
-        if (filters.location) params.append('type', filters.location)
-        if (filters.experienceLevel) params.append('level', filters.experienceLevel)
+        // no es necesario pero lo quise poner para que veas otra forma de evitar tantos `if` debajo del otro :)
+        const appendIfExists = (key, value) => {
+          if(value) params.append(key, value)
+        }
+        
+        appendIfExists('text', textToFilter)
+        appendIfExists('technology', filters.technology)
+        appendIfExists('type', filters.location)
+        appendIfExists('level', filters.experienceLevel)
 
         const offset = (currentPage - 1) * RESULTS_PER_PAGE
         params.append('limit', RESULTS_PER_PAGE)
@@ -137,8 +134,8 @@ const useFilters = () => {
   const handleReset = () => {
     setFilters(defaultFilters)
     setTextToFilter('')
-    localStorage.removeItem('jobFilters')
-    localStorage.removeItem('jobSearchText')
+    localStorage.removeItem(LOCAL_STORAGE_FILTERS_KEY)
+    localStorage.removeItem(LOCAL_STORAGE_TEXT_KEY)
     setCurrentPage(1)
   }
 
