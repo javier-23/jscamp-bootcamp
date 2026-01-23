@@ -1,5 +1,11 @@
 # Aquí puedes dejar tus dudas
 
+Muchas gracias por tus comentarios! Se agradece que expliques los cambios y el motivo de estos, así aprendo y mejoro.
+
+Tenía una duda con el archivo SearchFormSection.jsx, y es que tengo dos handleReset (uno en el componente y otro en el custom hook) y no entiendo muy bien que diferencia hay entre tenerlo cada uno en un sitio si además parece que hacen cosas parecidas o alomejor se puede simplificar, no lo tengo claro. 
+
+Por si podríais explicármelo, gracias!
+
 ## Primera parte
 
 <!-- Dudas de la primera parte del ejercicio -->
