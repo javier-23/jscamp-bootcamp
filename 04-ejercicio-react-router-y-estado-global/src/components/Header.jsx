@@ -1,9 +1,19 @@
-import { Link } from './Link'
+import { NavLink } from 'react-router'
+import { useAuthStore } from '../store/authStore.js'
+import { useFavoritesStore } from '../store/favoritesStore.js'
 
 export function Header() {
+  const { isLoggedIn, handleLogin, handleLogOut } = useAuthStore()
+  const { clearFavorites } = useFavoritesStore()
+
+  const logout = () => {
+      handleLogOut()
+      clearFavorites()
+  }
+
   return (
     <header>
-      <Link href="/" style={{ textDecoration: 'none' }}>
+      <NavLink to="/" style={{ textDecoration: 'none' }}>
         <h1 style={{ color: 'white' }}>
           <svg
             fill="none"
@@ -19,13 +29,26 @@ export function Header() {
           </svg>
           DevJobs
         </h1>
-      </Link>
+      </NavLink>
 
       <nav>
-        <Link href="/search">Empleos</Link>
+        <NavLink 
+          className={ ({isActive}) => isActive ? 'active-link' : '' }
+          to="/search"
+          aria-label="Ir a empleos"
+        >
+          Empleos
+        </NavLink>
 
         <a href="/search">Sin SPA</a>
       </nav>
+
+      <div>
+          {isLoggedIn 
+              ? <button className="btn-login" onClick={logout}>Cerrar sesión</button>
+              : <button className="btn-login" onClick={handleLogin}>Iniciar sesión</button> 
+          }
+      </div>
     </header>
   )
 }

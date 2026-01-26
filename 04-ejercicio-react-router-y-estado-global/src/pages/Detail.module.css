@@ -1,0 +1,168 @@
+.container {
+  padding-block: 2rem;
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.loading,
+.error {
+  padding-block: 5rem;
+  text-align: center;
+}
+
+.loadingText {
+  color: var(--text-muted);
+}
+
+.errorTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.errorButton {
+  color: #09f;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.errorButton:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb {
+  font-size: 0.875rem;
+  color: var( --text-light);
+  margin-bottom: 2rem;
+
+  a{
+    text-decoration: none;
+    color: inherit;
+
+    &:hover{
+      text-decoration: underline;
+    }
+  }
+}
+
+.breadcrumbTitle{
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.breadcrumbButton {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  text-decoration: none;
+}
+
+.breadcrumbButton:hover {
+  color: var(--text-primary);
+}
+
+.breadcrumbCurrent {
+  color: var(--text-primary);
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    height: auto;
+}
+
+.titleAndMeta{
+  flex-direction: column;
+}
+
+.title {
+  width: 100%;
+  font-size: 2.25rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+/* div que contiene empresa y ubicación */
+.meta {
+  display: flex;
+  width: 100%;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  opacity: .75;
+}
+
+.metaSeparator{
+  margin: 0 0.5rem;
+}
+
+.applyContainer{
+  display: flex;
+  justify-content: flex-end;
+  width: 33.3333%;
+    button:hover{
+        background-color: rgb(2, 101, 165);
+      }
+}
+
+.applyButton {
+  width: 100%;
+  background: #09f;
+  color: white;
+  border: none;
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  margin-bottom: 3rem;
+  transition: background 0.2s;
+  cursor: pointer;
+  margin-right: 0.2rem;
+
+  &.is-applied{
+    background-color: #4caf50;
+    pointer-events: none;
+  }
+}
+
+.applyButton:hover {
+  background: #0088e6;
+}
+
+.applyButton:disabled {
+  background: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.applyButton:disabled:hover {
+  background: #666;
+}
+
+@media (min-width: 640px) {
+  .applyButton {
+    width: auto;
+  }
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.sectionContent {
+  color: var(--text-secondary);
+}
+
+

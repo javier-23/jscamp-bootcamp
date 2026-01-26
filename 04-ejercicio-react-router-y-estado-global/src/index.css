@@ -429,3 +429,95 @@ article {
     pointer-events: none;
   }
 }
+
+/* Link activo del Header */
+.active-link{
+  border-bottom: 3px solid var(--text-primary);
+  border-radius: 2px;
+  padding-bottom: 2px;
+  color: var(--primary-light);
+  pointer-events: none;
+  opacity: 0.8;
+  user-select: none;
+}
+
+/* Estilos de prosa para contenido de detalle */
+.prose {
+  line-height: 1.7;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  margin-top: 1.5rem;
+  color: var(--text-primary);
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+}
+
+.prose h3 {
+  font-size: 1.25rem;
+}
+
+.prose p {
+  margin-bottom: 1rem;
+}
+
+.prose ul,
+.prose ol {
+  margin-left: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.prose ul {
+  list-style: disc;
+}
+
+.prose ol {
+  list-style: decimal;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose a {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.prose a:hover {
+  color: #0052a3;
+}
+
+.prose code {
+  background: #f3f4f6;
+  padding: 0.125rem 0.25rem;
+  border-radius: 4px;
+  font-size: 0.875em;
+  font-family: 'Courier New', monospace;
+}
+
+.prose ul.check {
+  list-style: none;
+  padding-left: 0;
+}
+
+.prose ul.check li {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.prose ul.check li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #16a34a;
+  font-weight: bold;
+}
