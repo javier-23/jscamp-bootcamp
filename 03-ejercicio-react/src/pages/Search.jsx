@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 import { SearchFormSection } from '../components/SearchFormSection'
 import { SearchResultsSection } from '../components/SearchResultsSection'
+import { useDebounce } from '../hooks/useDebounce'
 
 const RESULTS_PER_PAGE = 5
 
@@ -10,7 +11,7 @@ const LOCAL_STORAGE_FILTERS_KEY = 'jobFilters'
 const LOCAL_STORAGE_TEXT_KEY = 'jobSearchText'
 
 // Custom hook
-const useFilters = () => {
+const useJobsFilters = () => {
   const defaultFilters = {
     technology: '',
     location: '',
@@ -120,24 +121,41 @@ const useFilters = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleSearch = (filters) => {
-    setFilters(filters)
-    setTextToFilter(filters.search || '')
+  const handleFilterChange = (filterKey, value) => {
+    setFilters(prev => ({ ...prev, [filterKey]: value }))
     setCurrentPage(1)
   }
 
-  const handleTextFilter = (newText) => {
+  const handleTextChange = (newText) => {
     setTextToFilter(newText)
+  }
+
+  // creé una función para hacer debounce. Lo hice para que puedas ver que podemos crear hooks genéricos que puedan ser reutilizados en cualquier lugar. Como estaba antes está genial :)
+  const debouncedTextChange = useDebounce(() => {
+    setCurrentPage(1)
+  }, 500)
+
+  // para evitar logicas duplicadas, todo lo que tenga que ver con filtro y búsqueda, lo vamos a ejecutar dentro del hook que ya tenemos. Por esto, el debounce y búsqueda por texto que antes teníamos en `SearchFormSection.jsx` lo hacemos aquí :)
+  // No hace falta crear `handleTextChange` ni `handleTextChangeWithDebounce` porque se usan solo aquí, pero me pareció interesante como ejercicio de "dejar las cosas declarativas".
+  const handleTextChangeWithDebounce = (text) => {
+    handleTextChange(text)
+    debouncedTextChange(text)
+  }
+
+  const handleSubmit = () => {
     setCurrentPage(1)
   }
 
   const handleReset = () => {
     setFilters(defaultFilters)
     setTextToFilter('')
-    localStorage.removeItem(LOCAL_STORAGE_FILTERS_KEY)
-    localStorage.removeItem(LOCAL_STORAGE_TEXT_KEY)
     setCurrentPage(1)
   }
+
+  // usamos el `useMemo` para evitar que se calcule la variable `hasFilters` cada vez que se renderice el componente. Hay un patrón muy usado normalmente cuando trabajamos con datos en react y es que, cuando queremos filtrar datos, hay una gran chance de que lo podamos hacer con `useMemo`. Lo que dice estas lineas es: solo quiero que modifiques el valor de `hasFilters` cuando el texto/selects cambian.
+  const hasFilters = useMemo(() => {
+    return textToFilter || filters.technology || filters.location || filters.experienceLevel
+  }, [textToFilter, filters])
 
   const handleRetry = () => {
     setError(null)
@@ -145,46 +163,52 @@ const useFilters = () => {
     window.location.reload()
   }
 
+  // crack! cuando veas este cambio verás que el objeto de retorno es mas grande y complejo que el anterior. Quiero que sepas que la manera en la que lo hiciste también es correcta. Hice esto para agrupar responsabilidades y props (que sea mas fácil de entender y mantener). Al haber tantas props y handlers, puede ser difícil recordar y entender a que corresponde cada una. Por eso agruparlas es lo mejor, sobre todo cuando las usamos en puntos diferentes del código.
   return {
-    loading,
-    totalPages,
-    currentPage,
-    handlePageChange, 
-    handleSearch,
-    handleTextFilter,
-    handleReset,
-    jobs,
-    total,
-    filters,
-    textToFilter,
-    error,
-    handleRetry
+    jobs: {
+      values: {
+        jobs,
+        total,
+        loading,
+        error
+      },
+      handlers: {
+        handleRetry,
+      }
+    },
+    pagination: {
+      values: {
+        total: totalPages,
+        currentPage
+      },
+      handlers: {
+        handlePageChange
+      }
+    },
+    filters: {
+      values: {
+        filters,
+        textToFilter,
+        hasFilters
+      },
+      handlers: {
+        handleReset,
+        handleFilterChange,
+        handleTextChangeWithDebounce,
+        handleSubmit
+      }
+    }
   }
 }
 
 export function Search() {
+  const { jobs, pagination, filters } = useJobsFilters()
 
-  const {
-    loading,
-    totalPages,
-    currentPage,
-    handlePageChange,
-    handleSearch,
-    handleTextFilter,
-    handleReset,
-    jobs,
-    total,
-    filters,
-    textToFilter,
-    error,
-    handleRetry
-  } = useFilters()
-
-  const title = loading 
+  const title = jobs.values.loading 
     ? 'Cargando...' 
-    : error 
+    : jobs.values.error 
     ? 'Error al cargar' 
-    : `Resultados: ${total}, Página ${currentPage} - DevJobs`
+    : `Resultados: ${jobs.values.total}, Página ${pagination.values.currentPage} - DevJobs`
 
   return (
     <main>
@@ -192,14 +216,27 @@ export function Search() {
       <meta name="description" content="Encuentra las mejores ofertas de trabajo para desarrolladores en DevJobs."></meta>
       
       {/* Formulario de búsqueda */}
+      {/* Al dividir las props del hook por responsabilidades, aquí se ve claramente que todo lo que tiene que ver con filters, se encuentra SOLO en el componente `SearchFormSection` y no en `SearchResultsSection`. Esto... nos podría dar algún indicio de que podamos llevar el hook a `SearchFormSection`? | No lo hice en esta corrección porque siento que ya hicimos muchos cambios y más que aclarar, va a confundir más. Espero que hasta ahora se entienda bien, y siempre, en todo código, hay posibilidad de mejorar :)  */}
         <SearchFormSection 
-          onSearch={handleSearch} 
-          onTextFilter={handleTextFilter} 
-          onReset={handleReset}
-          initialFilters={filters}
-          initialText={textToFilter}
+          onTextChange={filters.handlers.handleTextChangeWithDebounce}
+          onFilterChange={filters.handlers.handleFilterChange}
+          onSubmit={filters.handlers.handleSubmit}
+          onReset={filters.handlers.handleReset}
+          searchText={filters.values.textToFilter}
+          filters={filters.values.filters}
+          hasFilters={filters.values.hasFilters}
           />
-      <SearchResultsSection jobs={jobs} loading={loading} error={error} handleRetry={handleRetry} totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} total={total} resultsPerPage={RESULTS_PER_PAGE}/>
+         <SearchResultsSection
+          jobs={jobs.values.jobs}
+          loading={jobs.values.loading}
+          error={jobs.values.error}
+          handleRetry={jobs.handlers.handleRetry}
+          totalPages={pagination.values.total}
+          currentPage={pagination.values.currentPage}
+          handlePageChange={pagination.handlers.handlePageChange}
+          total={jobs.values.total}
+          resultsPerPage={RESULTS_PER_PAGE}
+        />
     </main>
   )
 }
