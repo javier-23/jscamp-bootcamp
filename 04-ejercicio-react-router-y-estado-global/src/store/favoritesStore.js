@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 // set y get son herramientas de Zustand para actualizar y obtener el estado
-export const useFavoritesStore = create((set, get, store) => ({
+export const useFavoritesStore = create((set, get) => ({
     // Estado
     favorites: [],
 
