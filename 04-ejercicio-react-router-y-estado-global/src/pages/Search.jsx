@@ -59,6 +59,7 @@ const useFilters = () => {
 
     const page = Number(pageParam)
 
+      // Excelente validación!
       if (Number.isNaN(page) || page < 1) {
         return 1
       }
@@ -129,26 +130,26 @@ const useFilters = () => {
 
   // Sincronizar los filtros y la página actual con los parámetros de la URL
   useEffect(() => {
+    
     setSearchParams((prevParams) => {
-      const params = new URLSearchParams(prevParams)
+      const applyIfExist = (key, value) => {
+        if (value) prevParams.set(key, value)
+        else prevParams.delete(key)
+      }
       
-      if (textToFilter) params.set('text', textToFilter)
-        else params.delete('text')
-      if (filters.technology) params.set('technology', filters.technology)
-        else params.delete('technology')
-      if (filters.location) params.set('type', filters.location)
-        else params.delete('type')
-      if (filters.experienceLevel) params.set('level', filters.experienceLevel)
-        else params.delete('level')
+      applyIfExist('text', textToFilter)
+      applyIfExist('technology', filters.technology)
+      applyIfExist('type', filters.location)
+      applyIfExist('level', filters.experienceLevel)
       
       if(currentPage > 1){
-        params.set('page', currentPage)
+        prevParams.set('page', currentPage)
       }
       else if(currentPage === 1){
-        params.delete('page')
+        prevParams.delete('page')
       }
       
-      return params
+      return prevParams
     })
 
   }, [textToFilter, filters, currentPage, setSearchParams])
