@@ -8,7 +8,8 @@ import { useFavoritesStore } from "../store/favoritesStore.js"
 
 function JobSection({ title, content }) {
     let html = snarkdown(content ?? '') // Convierte markdown a HTML
-    html = html.replace(/<ul>/g, '<ul class="check">')
+    // también lo que podemos hacer es usar CSS. Todos los ul que estén dentro de `.section` los vamos a estilar. (Si te vas al CSS de `Detail.module.css` lo verás mejor)
+    // html = html.replace(/<ul>/g, '<ul class="check">')
 
     return (
         <section className={styles.section} >
