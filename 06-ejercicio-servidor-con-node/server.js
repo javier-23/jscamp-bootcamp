@@ -1,11 +1,91 @@
 import { createServer } from 'node:http'
+import { randomUUID } from 'node:crypto'
+import { json } from 'node:stream/consumers';
+
 
 process.loadEnvFile()
 
 const port = process.env.PORT || 3000
 
-const server = createServer((req, res) => {
+function sendJson(res, statusCode, data) {
+  res.statusCode = statusCode
+  res.setHeader('Content-Type', 'application/json; charset=utf-8')
+  res.end(JSON.stringify(data))
+}
+
+const server = createServer(async(req, res) => {
   // TODO: Aquí irá la lógica del servidor
+  const { method, url } = req
+  const [pathname, querystring] = url.split('?')
+
+  const searchParams = new URLSearchParams(querystring)
+
+  if (method === 'GET') {
+    
+    // Obtener todos los usuarios
+    if(pathname === '/users') {
+
+      // Filtros de búsqueda
+      const name = searchParams.get('name')
+      const minAge = searchParams.get('minAge')
+      const maxAge = searchParams.get('maxAge')
+      // Paginación
+      const limit = Number(searchParams.get('limit')) || users.length
+      const offset = Number(searchParams.get('offset')) || 0
+
+      let filteredUsers = users
+
+      if(name) {
+        filteredUsers = filteredUsers.filter(user => user.name.toLowerCase().includes(name.toLowerCase()))
+      }
+      if (minAge !== null){
+        const minAgeNum = Number(minAge)
+        if(!isNaN(minAgeNum)) {
+          filteredUsers = filteredUsers.filter(user => user.age >= minAgeNum)
+        }
+      }
+      if(maxAge !== null) {
+        const maxAgeNum = Number(maxAge)
+        if(!isNaN(maxAgeNum)) {
+          filteredUsers = filteredUsers.filter(user => user.age <= maxAgeNum)
+        }
+      }
+
+      const paginatedAndFilteredUsers = filteredUsers.slice(offset, offset + limit)
+
+      return sendJson(res, 200, paginatedAndFilteredUsers)
+    }
+
+    // Health check
+    if(pathname === '/health') {
+      return sendJson(res, 200, { status: 'ok', uptime: process.uptime() })
+    }
+  
+  }
+  else if (method === 'POST') {
+    
+    // Crear un nuevo usuario
+    if(pathname === '/users') {
+      const body = await json(req)
+      
+      if(!body.name || !body.age) {
+        return sendJson(res, 400, { error: 'El nombre y la edad son requeridos' })
+      }
+
+      const newUser = {
+        id: randomUUID(),
+        name: body.name,
+        age: body.age,
+      }
+
+      users.push(newUser)
+      return sendJson(res, 201, newUser)
+    }
+  }
+
+  // Manejo de rutas no encontradas
+  return sendJson(res, 404, { error: 'Ruta no encontrada' })
+
 })
 
 server.listen(port, () => {
