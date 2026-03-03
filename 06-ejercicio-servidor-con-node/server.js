@@ -62,7 +62,8 @@ const server = createServer(async(req, res) => {
     }
   
   }
-  else if (method === 'POST') {
+  /* No hace falta un else if. Con un if es suficiente */
+  if (method === 'POST') {
     
     // Crear un nuevo usuario
     if(pathname === '/users') {
