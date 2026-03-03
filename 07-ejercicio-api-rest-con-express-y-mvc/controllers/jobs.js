@@ -37,7 +37,8 @@ export class JobController {
         
         await JobModel.update(id, { titulo, empresa, ubicacion, descripcion, data, content });
 
-        res.json({ message: 'Job updated successfully' });
+        /* Podemos agregar en la respuesta el job actualizado */
+        res.json({ message: 'Job updated successfully', job: { id, titulo, empresa, ubicacion, descripcion, data, content } });
     }
 
     static async partialUpdate(req, res){
@@ -45,7 +46,8 @@ export class JobController {
         const { titulo, empresa, ubicacion, descripcion, data, content } = req.body;
         await JobModel.partialUpdate(id, { titulo, empresa, ubicacion, descripcion, data, content });
 
-        res.json({ message: 'Job partially updated successfully' });
+        /* Podemos agregar en la respuesta el job actualizado */
+        res.json({ message: 'Job partially updated successfully', job: { id, titulo, empresa, ubicacion, descripcion, data, content } });
     }
 
     static async delete(req, res){
