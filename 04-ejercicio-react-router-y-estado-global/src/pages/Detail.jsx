@@ -25,6 +25,27 @@ function JobSection({ title, content }) {
     )
 }
 
+function JobCardApplyButton() {
+    const [isApplied, setIsApplied] = useState(false)
+    const { isLoggedIn } = useAuthStore()
+
+    const handleApplyClick = (e) => {
+        e.stopPropagation() // Evitar que el click en el botón se propague al enlace padre
+        setIsApplied(true)
+    }
+
+    let buttonClasses = 'button-apply-job'
+    let buttonText = 'Aplicar'
+    if(isLoggedIn){
+        buttonClasses = isApplied ? 'button-apply-job is-applied' : 'button-apply-job'
+        buttonText = isApplied ? 'Aplicado' : 'Aplicar'
+    }
+
+    return (
+        <button disabled={!isLoggedIn} className={buttonClasses} onClick={handleApplyClick}>{buttonText}</button>
+    )
+}
+
 function DetailFavoriteButton({ jobId }) {
     const { isFavorite, toogleFavorite } = useFavoritesStore()
     const { isLoggedIn } = useAuthStore()
@@ -34,6 +55,7 @@ function DetailFavoriteButton({ jobId }) {
             disabled={!isLoggedIn}
             onClick={() => {toogleFavorite(jobId)}}
             aria-label={isFavorite(jobId) ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+            style={{ marginLeft: '4px' }}
             >
             {isFavorite(jobId) ? '❤️' : '🤍'}
         </button>
@@ -118,9 +140,7 @@ export default function JobDetail() {
                 </div>
 
                 <div className={styles.applyContainer}>
-                    <button className={styles.applyButton} disabled={!isLoggedIn}>
-                       {isLoggedIn ? 'Aplicar a esta oferta' : 'Inicia sesión para aplicar'}
-                    </button>
+                    <JobCardApplyButton jobId={String(job.id)}/>
                     <DetailFavoriteButton jobId={String(job.id)} />
                 </div>
             </header>

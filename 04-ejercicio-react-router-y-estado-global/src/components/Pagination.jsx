@@ -40,8 +40,8 @@ export function Pagination({ currentPage = 1, totalPages = 10, onPageChange }) {
   }
 
   return (
-    <nav className={styles.pagination}>
-      <a href={buildPageUrl(currentPage - 1)} style={stylePrevButton} onClick={handlePrevClick}>
+    <nav className={styles.pagination} id="pagination">
+      <a href={buildPageUrl(currentPage - 1)} style={stylePrevButton} onClick={handlePrevClick} aria-label="Anterior">
         <svg
           width="16"
           height="16"
@@ -69,7 +69,7 @@ export function Pagination({ currentPage = 1, totalPages = 10, onPageChange }) {
         </a>
       ))}
 
-      <a href={buildPageUrl(currentPage + 1)} style={styleNextButton} onClick={handleNextClick}>
+      <a href={buildPageUrl(currentPage + 1)} style={styleNextButton} onClick={handleNextClick} aria-label="Siguiente">
         <svg
           width="16"
           height="16"
