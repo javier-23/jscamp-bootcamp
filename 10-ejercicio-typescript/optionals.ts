@@ -6,7 +6,7 @@ import {
   filterByTechnology,
   filterByMinSalary,
 } from './functions.ts'
-import { Job } from './objects.ts';
+import type { Job } from './objects.ts';
 import { ExperienceLevel, Technology, WorkMode } from './types.ts';
 
 type SearchOptions = {

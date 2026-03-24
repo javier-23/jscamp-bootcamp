@@ -16,6 +16,7 @@ export type Job = {
     isActive: boolean;
     postedDate: Date;
 }
+
 export type Company = {
     id: string;
     name: string;
