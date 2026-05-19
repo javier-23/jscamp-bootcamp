@@ -7,28 +7,28 @@ export class JobModel {
   static async getAll(filters?: JobFilters): Promise<Job[]> {
     // TODO: Debemos hacer la consulta a la base de datos para obtener todos los resultados, y por cada filtro,
     // debemos agregarlo a la consulta
-    let query = 'SELECT j.*, FROM jobs j LEFT JOIN job_technologies jt ON j.id = jt.job_id'
+    let query = 'SELECT j.*, GROUP_CONCAT(jt.technology) AS technologies FROM jobs j LEFT JOIN job_technologies jt ON j.id = jt.job_id'
     
     const conditions: string[] = []
     const params: unknown[] = []
 
-    if (filters?.tech) {
+    if (filters?.technology) {
       conditions.push(`jt.technology = ?`)
-      params.push(filters.tech)
+      params.push(filters.technology)
     }
 
     if (filters?.modality) {
-      conditions.push(`jt.modality = ?`)
+      conditions.push(`modality = ?`)
       params.push(filters.modality)
     }
 
     if (filters?.level) {
-      conditions.push(`jt.level = ?`)
+      conditions.push(`level = ?`)
       params.push(filters.level)
     }
 
     if (conditions.length > 0) {
-      query += 'WHERE ' + conditions.join(' AND ') 
+      query += ' WHERE ' + conditions.join(' AND ') 
     }
 
     query += ' GROUP BY j.id'
@@ -42,7 +42,7 @@ export class JobModel {
       location: row.location,
       description: row.description,
       data: {
-        technology: row.technology.split(','),
+        technology: row.technologies ? row.technologies.split(',') : [],
         modality: row.modality,
         level: row.level
       }
@@ -52,7 +52,21 @@ export class JobModel {
   // Obtener un job por ID
   static async getById(id: string): Promise<Job | undefined> {
     // TODO: Debemos hacer la consulta a la base de datos para obtener el job por ID
-    return undefined
+    const row = db.prepare('SELECT j.*, GROUP_CONCAT(jt.technology) as technologies FROM jobs j LEFT JOIN job_technologies jt ON j.id = jt.job_id WHERE j.id = ?').get(id)
+    if (!row) return undefined
+
+    return row ? {
+      id: row.id,
+      title: row.title,
+      company: row.company,
+      location: row.location,
+      description: row.description,
+      data: {
+        technology: row.technologies ? row.technologies.split(',') : [],
+        modality: row.modality,
+        level: row.level
+      }
+    } : undefined;
   }
 
   // Crear un nuevo job
@@ -63,18 +77,65 @@ export class JobModel {
     }
 
     // TODO: Debemos insertar el job en la base de datos
+    const insertJob = db.prepare('INSERT INTO jobs (id, title, company, location, description, modality, level) VALUES (?, ?, ?, ?, ?, ?, ?)')
+    
+    const insertTechnology = db.prepare('INSERT INTO job_technologies (technology, job_id) VALUES (?, ?)')
+
+    const transaction = db.transaction(() => {
+      insertJob.run(newJob.id, newJob.title, newJob.company, newJob.location, newJob.description, newJob.data.modality, newJob.data.level)
+      newJob.data.technology && newJob.data.technology.forEach(tech => {
+        insertTechnology.run(tech, newJob.id)
+      })
+    })
+
+    transaction()
+    
     return newJob
   }
 
   // Eliminar un job
   static async delete(id: string): Promise<boolean> {
     // TODO: Debemos eliminar el job de la base de datos
-    return false
+    const result = db.prepare('DELETE FROM jobs WHERE id = ?').run(id)
+    return !!result.changes
   }
 
   // Actualizar un job
   static async update(id: string, input: UpdateJobDTO): Promise<Job | null> {
     // TODO: Debemos actualizar el job en la base de datos
-    return null
+    const currentJob = await this.getById(id)
+    if (!currentJob) return null
+
+    const updatedJobData = {
+    ...currentJob,
+    ...input,
+    data: {
+      ...currentJob.data,
+      ...input.data,
+    },
+  }
+
+    const updateJob = db.prepare('UPDATE jobs SET title = ?, company = ?, location = ?, description = ?, modality = ?, level = ? WHERE id = ?')
+    
+    // Borras las tecnologías anteriores
+    const deleteTechnologies = db.prepare('DELETE FROM job_technologies WHERE job_id = ?')
+    const updateTechnologies = db.prepare('INSERT INTO job_technologies (technology, job_id) VALUES (?, ?)')
+
+    const transaction = db.transaction(() => {
+      updateJob.run(updatedJobData.title, updatedJobData.company, updatedJobData.location, updatedJobData.description, updatedJobData.data?.modality, updatedJobData.data?.level, id)
+      
+      if(input.data?.technology){
+        deleteTechnologies.run(id)
+        input.data?.technology.forEach(tech => {
+          updateTechnologies.run(tech, id)
+        })
+      }
+    })
+
+    transaction()
+
+    const updatedJob = await this.getById(id)
+
+    return updatedJob ?? null
   }
 }

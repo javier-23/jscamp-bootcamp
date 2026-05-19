@@ -6,8 +6,8 @@ export class JobController {
   // GET /jobs
   // Query params tipados
   static async getAll(req: Request<{}, {}, {}, JobFilters>, res: Response): Promise<void> {
-    const { tech, modality, level } = req.query
-    const jobs = await JobModel.getAll({ tech, modality, level })
+    const { technology, modality, level } = req.query
+    const jobs = await JobModel.getAll({ technology, modality, level })
     res.json(jobs)
   }
 

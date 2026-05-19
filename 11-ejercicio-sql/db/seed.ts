@@ -9,15 +9,15 @@ db.exec(`
     location TEXT NOT NULL,
     description TEXT NOT NULL,
     modality TEXT NOT NULL CHECK(modality IN ('remote', 'onsite', 'hybrid')),
-    level TEXT NOT NULL CHECK(level IN ('junior', 'mid', 'senior')),
-  )
+    level TEXT NOT NULL CHECK(level IN ('junior', 'mid', 'senior'))
+  );
 
   CREATE TABLE IF NOT EXISTS job_technologies (
     job_id TEXT NOT NULL,
     technology TEXT NOT NULL,
     PRIMARY KEY (job_id, technology),
     FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
-  )
+  );
 
   CREATE TABLE IF NOT EXISTS job_content (
     id TEXT PRIMARY KEY,
