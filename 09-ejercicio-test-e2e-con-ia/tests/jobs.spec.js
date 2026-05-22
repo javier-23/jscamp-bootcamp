@@ -64,6 +64,8 @@ test('Test para verificar filtros de búsqueda', async ({ page }) => {
     await page.getByRole('button', { name: 'Buscar' }).click()
     
     // Aplicar filtro de ubicacion
+    // Aquí lo que podemos hacer es buscar por rol y aria-label, para tener una mejor accesibilidad y control en el test (además de que es una mejor práctica que usar solo el ID)
+    // await page.getByRole('combobox', { name: 'Ubicación' }).selectOption('Remoto')
     await page.locator('#filter-location').selectOption('Remoto')
     const jobCards = page.getByRole('article')
     
@@ -91,6 +93,8 @@ test('Test de paginación', async ({ page }) => {
     await page.getByRole('button', { name: 'Buscar' }).click()
 
     // Verificar que aparezca el componente de paginación
+    // Podemos hacer una busqueda por role navigation
+    // const pagination = page.getByRole('navigation', { name: 'Paginación principal' })
     const pagination = page.locator('#pagination')
     await expect(pagination).toBeVisible()
 
