@@ -1,6 +1,12 @@
 /* Aquí deberás usar los tipos creados en los ejercicios anteriores para definir los tipos de los parámetros y el valor de retorno de las funciones */
 import type { Job } from "./objects"
 import type { ExperienceLevel, Technology } from "./types"
+import type { JobSearchService } from './interfaces'
+
+// Te dejo una alternativa de uso de las interfaces
+export const  filterByExperience2: JobSearchService['filterByExperience'] = (jobs, level) => {
+  return jobs.filter((job) => job.experienceLevel === level)
+}
 
 export function filterByExperience(jobs: Job[], level: ExperienceLevel): Job[] {
   return jobs.filter((job) => job.experienceLevel === level)
