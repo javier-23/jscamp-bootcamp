@@ -45,7 +45,27 @@ const insertJobContent = db.prepare(`
   VALUES (?, ?, ?, ?, ?, ?)
 `)
 
+// Una alternativa que podemos hacer es obtener el seed del json que tenemos de jobs.json
+// y luego insertarlos en la base de datos
+import { readFileSync } from 'node:fs'
+
+const jobs = JSON.parse(readFileSync('./jobs.json', 'utf-8'))
+
 const seed = db.transaction(() => {
+  for (const job of jobs) {
+    insertJob.run(job.id, job.title, job.company, job.location, job.description, job.modality, job.level)
+    
+    for (const tech of job.technologies) {
+      insertJobTechnology.run(job.id, tech)
+    }
+
+    if (job.content) {
+      insertJobContent.run(job.id, job.id, job.content.description, job.content.responsibilities, job.content.requirements, job.content.about)
+    }
+  }
+})
+
+/* const seed = db.transaction(() => {
     insertJob.run('1', 'Senior Frontend Developer', 'Tech Corp', 'Madrid, Spain',
     'Looking for a senior frontend developer', 'hybrid', 'senior')
     insertJobTechnology.run('1', 'React')
@@ -63,7 +83,7 @@ const seed = db.transaction(() => {
     insertJobTechnology.run('3', 'Node.js')
     insertJobTechnology.run('3', 'TypeScript')
     insertJobTechnology.run('3', 'MongoDB')
-})
+}) */
 
 seed()
 

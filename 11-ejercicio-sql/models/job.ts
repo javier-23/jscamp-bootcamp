@@ -7,23 +7,36 @@ export class JobModel {
   static async getAll(filters?: JobFilters): Promise<Job[]> {
     // TODO: Debemos hacer la consulta a la base de datos para obtener todos los resultados, y por cada filtro,
     // debemos agregarlo a la consulta
-    let query = 'SELECT j.*, GROUP_CONCAT(jt.technology) AS technologies FROM jobs j LEFT JOIN job_technologies jt ON j.id = jt.job_id'
+    // Podemos agregar también el Content que insertamos en la base de datos
+     let query = `
+      SELECT j.*, GROUP_CONCAT(jt.technology) AS technologies,
+        jc.description AS content_description,
+        jc.responsibilities, jc.requirements, jc.about
+      FROM jobs j
+      JOIN job_technologies jt ON j.id = jt.job_id
+      LEFT JOIN job_content jc ON j.id = jc.job_id
+    `
+
+    // let query = 'SELECT j.*, GROUP_CONCAT(jt.technology) AS technologies FROM jobs j LEFT JOIN job_technologies jt ON j.id = jt.job_id'
     
     const conditions: string[] = []
     const params: unknown[] = []
 
     if (filters?.technology) {
-      conditions.push(`jt.technology = ?`)
+      conditions.push(`j.id IN (SELECT job_id FROM job_technologies WHERE technology = ?)`)
+      // conditions.push(`jt.technology = ?`)
       params.push(filters.technology)
     }
 
     if (filters?.modality) {
-      conditions.push(`modality = ?`)
+      conditions.push(`j.modality = ?`)
+      // conditions.push(`modality = ?`)
       params.push(filters.modality)
     }
 
     if (filters?.level) {
-      conditions.push(`level = ?`)
+      conditions.push(`j.level = ?`)
+      // conditions.push(`level = ?`)
       params.push(filters.level)
     }
 
@@ -42,9 +55,16 @@ export class JobModel {
       location: row.location,
       description: row.description,
       data: {
-        technology: row.technologies ? row.technologies.split(',') : [],
+        technology: row.technologies.split(','), // SI no existe technology, split devolverá un array vacío
         modality: row.modality,
         level: row.level
+      },
+      // Agregamos el content
+      content: {
+        description: row.content_description ?? '',
+        responsibilities: row.responsibilities ?? '',
+        requirements: row.requirements ?? '',
+        about: row.about ?? ''
       }
     }))
   }
@@ -52,7 +72,19 @@ export class JobModel {
   // Obtener un job por ID
   static async getById(id: string): Promise<Job | undefined> {
     // TODO: Debemos hacer la consulta a la base de datos para obtener el job por ID
-    const row = db.prepare('SELECT j.*, GROUP_CONCAT(jt.technology) as technologies FROM jobs j LEFT JOIN job_technologies jt ON j.id = jt.job_id WHERE j.id = ?').get(id)
+    // Hacemos lo mismo que en el método getAll
+     const row = db.prepare(`
+      SELECT j.*, GROUP_CONCAT(jt.technology) AS technologies,
+        jc.description AS content_description,
+        jc.responsibilities, jc.requirements, jc.about
+      FROM jobs j
+      JOIN job_technologies jt ON j.id = jt.job_id
+      LEFT JOIN job_content jc ON j.id = jc.job_id
+      WHERE j.id = ?
+      GROUP BY j.id
+    `).get(id) as any // <- Es mejor hacer un tipado, pero para evitar errores de typescript, usaremos un `any`
+
+    // const row = db.prepare('SELECT j.*, GROUP_CONCAT(jt.technology) as technologies FROM jobs j LEFT JOIN job_technologies jt ON j.id = jt.job_id WHERE j.id = ?').get(id)
     if (!row) return undefined
 
     return row ? {
@@ -113,6 +145,8 @@ export class JobModel {
       ...currentJob.data,
       ...input.data,
     },
+    // Agregamos el content
+    content: input.content ? { ...currentJob.content, ...input.content } : currentJob.content
   }
 
     const updateJob = db.prepare('UPDATE jobs SET title = ?, company = ?, location = ?, description = ?, modality = ?, level = ? WHERE id = ?')
@@ -120,7 +154,16 @@ export class JobModel {
     // Borras las tecnologías anteriores
     const deleteTechnologies = db.prepare('DELETE FROM job_technologies WHERE job_id = ?')
     const updateTechnologies = db.prepare('INSERT INTO job_technologies (technology, job_id) VALUES (?, ?)')
-
+    // Hacemos una actualización de `content` también
+    const updateContent = db.prepare(`
+          INSERT INTO job_content (id, job_id, description, responsibilities, requirements, about)
+          VALUES (?, ?, ?, ?, ?, ?)
+          ON CONFLICT(id) DO UPDATE SET
+            description = excluded.description,
+            responsibilities = excluded.responsibilities,
+            requirements = excluded.requirements,
+            about = excluded.about
+        `)
     const transaction = db.transaction(() => {
       updateJob.run(updatedJobData.title, updatedJobData.company, updatedJobData.location, updatedJobData.description, updatedJobData.data?.modality, updatedJobData.data?.level, id)
       
@@ -129,6 +172,10 @@ export class JobModel {
         input.data?.technology.forEach(tech => {
           updateTechnologies.run(tech, id)
         })
+      }
+
+      if (updatedJobData.content) {
+        updateContent.run(id, id, updatedJobData.content.description, updatedJobData.content.responsibilities, updatedJobData.content.requirements, updatedJobData.content.about)
       }
     })
 
