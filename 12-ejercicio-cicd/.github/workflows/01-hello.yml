@@ -1,0 +1,19 @@
+name: 01 - Hello
+
+jobs:
+    saludar:
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Saludar
+              run: echo "Hola desde GitHub Actions"
+            - name: Fecha
+              run: date
+            - name: Listar archivos
+              run: ls -la
+    repo-files:
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Descargar codigo repositorio
+              uses: actions/checkout@v3
+            - name: Listar archivos del repositorio
+              run: ls -la
