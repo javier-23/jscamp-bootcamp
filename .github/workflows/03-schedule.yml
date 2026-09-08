@@ -1,0 +1,12 @@
+name: 03 - Schedule
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Ejecutar todos los lunes a las 9:00 AM UTC: minutos, horas, día del mes, mes, día de la semana (0-6, donde 0 es domingo)  
+  workflow_dispatch:
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Saludo
+      run: echo "Hola desde GitHub Actions!"
