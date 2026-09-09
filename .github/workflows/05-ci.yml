@@ -1,0 +1,90 @@
+name: 05 - CI
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+jobs:
+    frontend-lint:
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6
+
+            - name: Usar composite action para instalar pnpm y node
+              uses: ./.github/actions/setup-pnpm-ci-cd
+        
+            - name: Ejectuar scripts del monorepo
+              run: |
+                  pnpm lint:frontend
+                  
+    frontend-test: 
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6 
+
+            - name: Usar composite action para instalar pnpm y node
+              uses: ./.github/actions/setup-pnpm-ci-cd
+
+            - name: Ejectuar scripts del monorepo
+              run: |
+                  pnpm test:frontend
+
+    backend-lint: 
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6 
+
+            - name: Usar composite action para instalar pnpm y node
+              uses: ./.github/actions/setup-pnpm-ci-cd
+
+            - name: Ejectuar scripts del monorepo
+              run: |
+                  pnpm lint:backend
+
+    backend-test:
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6 
+
+            - name: Usar composite action para instalar pnpm y node
+              uses: ./.github/actions/setup-pnpm-ci-cd
+
+            - name: Ejectuar scripts del monorepo
+              run: |
+                  pnpm test:backend
+
+    frontend-build:
+        #Solo se ejecuta si frontend-lint y frontend-test son exitosos
+        needs: [frontend-lint, frontend-test]
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6 
+
+            - name: Usar composite action para instalar pnpm y node
+              uses: ./.github/actions/setup-pnpm-ci-cd
+
+            - name: Ejectuar scripts del monorepo
+              run: |
+                  pnpm build:frontend
+        
+    backend-build:
+        #Solo se ejecuta si backend-lint y backend-test son exitosos
+        needs: [backend-lint, backend-test]
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6 
+
+            - name: Usar composite action para instalar pnpm y node
+              uses: ./.github/actions/setup-pnpm-ci-cd
+
+            - name: Ejectuar scripts del monorepo
+              run: |
+                  pnpm build:backend
