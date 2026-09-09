@@ -34,6 +34,7 @@ jobs:
 
             - name: Ejectuar scripts del monorepo
               run: |
+                  cd ./12-ejercicio-cicd/
                   pnpm test:frontend
 
     backend-lint: 
@@ -47,6 +48,7 @@ jobs:
 
             - name: Ejectuar scripts del monorepo
               run: |
+                  cd ./12-ejercicio-cicd/
                   pnpm lint:backend
 
     backend-test:
@@ -60,6 +62,7 @@ jobs:
 
             - name: Ejectuar scripts del monorepo
               run: |
+                  cd ./12-ejercicio-cicd/
                   pnpm test:backend
 
     frontend-build:
@@ -73,8 +76,9 @@ jobs:
             - name: Usar composite action para instalar pnpm y node
               uses: ./.github/actions/setup-pnpm-ci-cd
 
-            - name: Ejectuar scripts del monorepo
+            - name: Ejecutar scripts del monorepo
               run: |
+                  cd ./12-ejercicio-cicd/
                   pnpm build:frontend
         
     backend-build:
@@ -88,6 +92,7 @@ jobs:
             - name: Usar composite action para instalar pnpm y node
               uses: ./.github/actions/setup-pnpm-ci-cd
 
-            - name: Ejectuar scripts del monorepo
+            - name: Ejecutar scripts del monorepo
               run: |
+                  cd ./12-ejercicio-cicd/
                   pnpm build:backend
