@@ -97,23 +97,22 @@ jobs:
                   cd ./12-ejercicio-cicd/
                   pnpm build:backend
         
-        frontend-test-matrix:
+    frontend-test-matrix:
+        runs-on: ${{ matrix.os }}
         strategy:
             matrix:
                 os: [ubuntu-24.04, macos-latest, windows-latest]
                 node: ['22', '24']
 
-        runs-on: ${{ matrix.os }}
-
         steps:
             - name: Checkout code
-              uses: actions/checkout@v6
+            uses: actions/checkout@v6
 
             - name: Usar composite action para instalar pnpm y node
-              uses: ./.github/actions/setup-pnpm-ci-cd
-              with:
-                  node-version: ${{ matrix.node }}
+            uses: ./.github/actions/setup-pnpm-ci-cd
+            with:
+                node-version: ${{ matrix.node }}
 
             - name: Ejecutar tests del frontend
-              working-directory: ./12-ejercicio-cicd
-              run: pnpm test:frontend
+            working-directory: ./12-ejercicio-cicd
+            run: pnpm test:frontend
