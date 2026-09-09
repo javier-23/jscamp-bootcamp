@@ -18,7 +18,10 @@ jobs:
         
             - name: Ejectuar scripts del monorepo
               run: |
+                  cd ./12-ejercicio-cicd/
+                  echo "::group::Lint"
                   pnpm lint:frontend
+                  echo "::endgroup::"
                   
     frontend-test: 
         runs-on: ubuntu-24.04
