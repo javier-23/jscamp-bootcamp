@@ -106,13 +106,13 @@ jobs:
 
         steps:
             - name: Checkout code
-            uses: actions/checkout@v6
+              uses: actions/checkout@v6
 
             - name: Usar composite action para instalar pnpm y node
-            uses: ./.github/actions/setup-pnpm-ci-cd
-            with:
+              uses: ./.github/actions/setup-pnpm-ci-cd
+              with:
                 node-version: ${{ matrix.node }}
 
             - name: Ejecutar tests del frontend
-            working-directory: ./12-ejercicio-cicd
-            run: pnpm test:frontend
+              working-directory: ./12-ejercicio-cicd
+              run: pnpm test:frontend
