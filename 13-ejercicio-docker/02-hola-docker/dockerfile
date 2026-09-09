@@ -1,0 +1,5 @@
+FROM alpine:latest
+
+// Imprimir mensaje en la consola
+
+RUN echo "Hola Docker"
