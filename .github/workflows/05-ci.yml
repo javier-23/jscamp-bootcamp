@@ -6,6 +6,10 @@ on:
     pull_request:
         branches:
             - main
+defaults:
+  run:
+    working-directory: 12-ejercicio-cicd   # Para evitar escribir `cd` en cada job, podemos simplificarlo con esta linea
+
 jobs:
     frontend-lint:
         runs-on: ubuntu-24.04
@@ -18,7 +22,6 @@ jobs:
         
             - name: Ejectuar scripts del monorepo
               run: |
-                  cd ./12-ejercicio-cicd/
                   echo "::group::Lint"
                   pnpm lint:frontend
                   echo "::endgroup::"
@@ -34,7 +37,6 @@ jobs:
 
             - name: Ejectuar scripts del monorepo
               run: |
-                  cd ./12-ejercicio-cicd/
                   pnpm test:frontend
 
     backend-lint: 
@@ -48,7 +50,6 @@ jobs:
 
             - name: Ejectuar scripts del monorepo
               run: |
-                  cd ./12-ejercicio-cicd/
                   pnpm lint:backend
 
     backend-test:
@@ -62,7 +63,6 @@ jobs:
 
             - name: Ejectuar scripts del monorepo
               run: |
-                  cd ./12-ejercicio-cicd/
                   pnpm test:backend
 
     frontend-build:
@@ -78,7 +78,6 @@ jobs:
 
             - name: Ejecutar scripts del monorepo
               run: |
-                  cd ./12-ejercicio-cicd/
                   pnpm build:frontend
         
     backend-build:
@@ -94,7 +93,6 @@ jobs:
 
             - name: Ejecutar scripts del monorepo
               run: |
-                  cd ./12-ejercicio-cicd/
                   pnpm build:backend
         
     frontend-test-matrix:
