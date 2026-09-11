@@ -1,5 +1,3 @@
 FROM alpine:latest
 
-// Imprimir mensaje en la consola
-
-RUN echo "Hola Docker"
+CMD ["echo", "Hola desde mi primera imagen!"]
