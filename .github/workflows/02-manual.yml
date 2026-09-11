@@ -5,6 +5,7 @@ on:
       logging_level:
         description: Nivel de logging
         required: true
+        default: "info"   # Podemos agregar un valor como default
       environment:
         description: Entorno de despliegue
         required: true
